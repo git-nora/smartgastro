@@ -1,0 +1,224 @@
+{
+  "info": {
+    "_postman_id": "smartgastro-collection-v1",
+    "name": "SmartGastro API",
+    "description": "Colección de pruebas para la API REST de SmartGastro.\nServidor: Flask corriendo en http://127.0.0.1:5000\n\nPara usar esta colección:\n1. Levantá el servidor Flask con: python app.py\n2. Importá este archivo en Postman (File > Import)\n3. Ejecutá las requests en orden",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Productos",
+      "description": "Endpoints para gestión de productos del inventario",
+      "item": [
+        {
+          "name": "GET - Ver todos los productos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:5000/api/productos",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "5000",
+              "path": ["api", "productos"]
+            },
+            "description": "Retorna el listado completo de productos del inventario.\nRespuesta esperada: 200 OK con array de productos."
+          },
+          "response": [
+            {
+              "name": "200 OK - Listado de productos",
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "[\n  {\"id\": 1, \"nombre\": \"Hamburguesa Clásica\", \"precio\": 3500, \"stock\": 20, \"categoria\": \"comida\"},\n  {\"id\": 2, \"nombre\": \"Papas Fritas\", \"precio\": 1500, \"stock\": 30, \"categoria\": \"comida\"},\n  {\"id\": 3, \"nombre\": \"Gaseosa 500ml\", \"precio\": 800, \"stock\": 40, \"categoria\": \"bebida\"}\n]",
+              "originalRequest": {
+                "method": "GET",
+                "url": {"raw": "http://127.0.0.1:5000/api/productos"}
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST - Agregar nuevo producto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Hamburguesa Doble\",\n  \"precio\": 4800,\n  \"stock\": 20,\n  \"categoria\": \"comida\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:5000/api/productos",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "5000",
+              "path": ["api", "productos"]
+            },
+            "description": "Crea un nuevo producto en el inventario.\nRespuesta esperada: 201 Created con el producto creado y su ID asignado."
+          },
+          "response": [
+            {
+              "name": "201 Created - Producto creado",
+              "status": "Created",
+              "code": 201,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\"id\": 4, \"nombre\": \"Hamburguesa Doble\", \"precio\": 4800, \"stock\": 20, \"categoria\": \"comida\"}",
+              "originalRequest": {
+                "method": "POST",
+                "url": {"raw": "http://127.0.0.1:5000/api/productos"},
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"nombre\": \"Hamburguesa Doble\", \"precio\": 4800, \"stock\": 20, \"categoria\": \"comida\"}"
+                }
+              }
+            },
+            {
+              "name": "400 Bad Request - Datos inválidos",
+              "status": "Bad Request",
+              "code": 400,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\"error\": \"El campo 'nombre' es obligatorio\"}",
+              "originalRequest": {
+                "method": "POST",
+                "url": {"raw": "http://127.0.0.1:5000/api/productos"}
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE - Eliminar producto",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:5000/api/productos/1",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "5000",
+              "path": ["api", "productos", "1"]
+            },
+            "description": "Elimina el producto con el ID indicado en la URL.\nRespuesta esperada: 204 No Content (sin body).\nSi el ID no existe: 404 Not Found."
+          },
+          "response": [
+            {
+              "name": "204 No Content - Eliminado",
+              "status": "No Content",
+              "code": 204,
+              "header": [],
+              "body": "",
+              "originalRequest": {
+                "method": "DELETE",
+                "url": {"raw": "http://127.0.0.1:5000/api/productos/1"}
+              }
+            },
+            {
+              "name": "404 Not Found - Producto inexistente",
+              "status": "Not Found",
+              "code": 404,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\"error\": \"Producto con id 1 no encontrado\"}",
+              "originalRequest": {
+                "method": "DELETE",
+                "url": {"raw": "http://127.0.0.1:5000/api/productos/1"}
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pedidos",
+      "description": "Endpoints para gestión del estado de pedidos",
+      "item": [
+        {
+          "name": "PATCH - Actualizar estado de pedido",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"listo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:5000/api/pedidos/1",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "5000",
+              "path": ["api", "pedidos", "1"]
+            },
+            "description": "Actualiza únicamente el campo 'estado' de un pedido.\nEstados posibles: 'pendiente', 'en_preparacion', 'listo', 'entregado'.\nRespuesta esperada: 200 OK con el pedido actualizado."
+          },
+          "response": [
+            {
+              "name": "200 OK - Estado actualizado",
+              "status": "OK",
+              "code": 200,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\"id\": 1, \"estado\": \"listo\", \"producto\": \"Papas Fritas\", \"cantidad\": 2, \"total\": 3000}",
+              "originalRequest": {
+                "method": "PATCH",
+                "url": {"raw": "http://127.0.0.1:5000/api/pedidos/1"},
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"estado\": \"listo\"}"
+                }
+              }
+            },
+            {
+              "name": "404 Not Found - Pedido inexistente",
+              "status": "Not Found",
+              "code": 404,
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "body": "{\"error\": \"Pedido con id 1 no encontrado\"}",
+              "originalRequest": {
+                "method": "PATCH",
+                "url": {"raw": "http://127.0.0.1:5000/api/pedidos/1"}
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:5000",
+      "description": "URL base del servidor Flask. Cambiar si se deploya en otro host."
+    }
+  ]
+}

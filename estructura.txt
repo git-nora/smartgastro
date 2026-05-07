@@ -1,0 +1,8 @@
+
+smartgastro/
+
+├── smartgastro.py                     
+├── SmartGastro_Postman_Collection.json 
+├── README.md                          
+└── docs/
+    └── SmartGastro_TP.pdf             
