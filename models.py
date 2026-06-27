@@ -3,7 +3,7 @@ SmartGastro - Modelos de base de datos
 Lassalle Nora - Hernández Andrés
 """
 
-from app import db
+from extensions import db
 from datetime import datetime
 
 

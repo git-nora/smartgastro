@@ -1,28 +1,30 @@
 """
-SmartGastro - Aplicacion Web
+SmartGastro - Aplicación Web
 Segunda Entrega - AyMS 2026
-Lassalle Nora - Hernandez Andres
+Lassalle Nora - Hernández Andrés
 """
 
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt
+from extensions import db, bcrypt
 from dotenv import load_dotenv
 import os
 
-# Cargar variables del archivo .env
 load_dotenv()
 
 app = Flask(__name__)
 
-# Configuracion desde variables de entorno
 app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# Extensiones
-db = SQLAlchemy(app)
-bcrypt = Bcrypt(app)
+db.init_app(app)
+bcrypt.init_app(app)
+
+with app.app_context():
+    from models import Usuario, Producto, Venta, DetalleVenta, Proveedor, Locacion
+    db.create_all()
+    from auth import auth_bp
+    app.register_blueprint(auth_bp)
 
 if __name__ == "__main__":
     print("=" * 50)
