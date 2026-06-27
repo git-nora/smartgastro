@@ -1,0 +1,17 @@
+# Secretos - nunca subir
+.env
+
+# Base de datos local
+*.db
+
+# Python
+__pycache__/
+*.pyc
+
+# Entorno virtual
+venv/
+env/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
