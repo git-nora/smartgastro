@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block titulo %}Locaciones{% endblock %}
+
+{% block contenido %}
+<div class="page-header">
+    <h2>Locaciones</h2>
+</div>
+
+<table class="tabla">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Dirección</th>
+            <th>Fecha</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for l in locaciones %}
+        <tr>
+            <td>{{ l.nombre }}</td>
+            <td>{{ l.direccion or '-' }}</td>
+            <td>{{ l.fecha }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

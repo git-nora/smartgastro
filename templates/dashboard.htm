@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block titulo %}Dashboard{% endblock %}
+
+{% block contenido %}
+<h2>Dashboard</h2>
+
+{% if clima and not clima.error %}
+    {% if clima.hay_lluvia %}
+        <div class="alerta alerta-lluvia">
+            🌧️ {{ clima.alerta }}
+        </div>
+    {% endif %}
+    <div class="clima-card">
+        <h3>🌤️ Clima en {{ clima.ciudad }}</h3>
+        <p>{{ clima.descripcion }} — {{ clima.temperatura }}°C</p>
+        <p>Humedad: {{ clima.humedad }}%</p>
+    </div>
+{% endif %}
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>Productos</h3>
+        <p class="stat-numero">{{ total_productos }}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Ventas hoy</h3>
+        <p class="stat-numero">{{ total_ventas }}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Proveedores</h3>
+        <p class="stat-numero">{{ total_proveedores }}</p>
+    </div>
+</div>
+
+{% if productos_stock_bajo %}
+<div class="alerta alerta-warning">
+    ⚠️ Productos con stock bajo:
+    {% for p in productos_stock_bajo %}
+        <strong>{{ p.nombre }}</strong> ({{ p.stock }} uds.){% if not loop.last %}, {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

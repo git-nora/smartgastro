@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block titulo %}Productos{% endblock %}
+
+{% block contenido %}
+<div class="page-header">
+    <h2>Productos</h2>
+    <button class="btn btn-primary" onclick="mostrarFormulario()">+ Nuevo producto</button>
+</div>
+
+<div id="formulario-nuevo" class="form-card" style="display:none;">
+    <h3>Nuevo producto</h3>
+    <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" id="nombre" placeholder="Ej: Hamburguesa clásica">
+    </div>
+    <div class="form-group">
+        <label>Precio ($)</label>
+        <input type="number" id="precio" placeholder="0">
+    </div>
+    <div class="form-group">
+        <label>Stock inicial</label>
+        <input type="number" id="stock" placeholder="0">
+    </div>
+    <div class="form-group">
+        <label>Categoría</label>
+        <select id="categoria">
+            <option value="comida">Comida</option>
+            <option value="bebida">Bebida</option>
+            <option value="postre">Postre</option>
+        </select>
+    </div>
+    <button class="btn btn-primary" onclick="guardarProducto()">Guardar</button>
+    <button class="btn btn-secondary" onclick="ocultarFormulario()">Cancelar</button>
+    <p id="mensaje-resultado"></p>
+</div>
+
+<table class="tabla">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Categoría</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in productos %}
+        <tr>
+            <td>{{ p.nombre }}</td>
+            <td>${{ p.precio }}</td>
+            <td>{{ p.stock }}</td>
+            <td>{{ p.categoria }}</td>
+            <td>
+                {% if p.stock <= p.stock_minimo %}
+                    <span class="badge badge-warning">Stock bajo</span>
+                {% else %}
+                    <span class="badge badge-ok">OK</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/productos.js') }}"></script>
+{% endblock %}
