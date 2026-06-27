@@ -13,7 +13,7 @@ routes_bp = Blueprint("routes", __name__)
 
 
 # ─────────────────────────────────────────────
-#  PRODUCTOS
+#                  PRODUCTOS
 # ─────────────────────────────────────────────
 
 @routes_bp.route("/api/productos", methods=["GET"])
@@ -119,7 +119,7 @@ def eliminar_producto(usuario_actual, id):
 
 
 # ─────────────────────────────────────────────
-#  VENTAS
+#                    VENTAS
 # ─────────────────────────────────────────────
 
 @routes_bp.route("/api/ventas", methods=["GET"])
@@ -199,7 +199,7 @@ def crear_venta(usuario_actual):
 
 
 # ─────────────────────────────────────────────
-#  PROVEEDORES
+#                 PROVEEDORES
 # ─────────────────────────────────────────────
 
 @routes_bp.route("/api/proveedores", methods=["GET"])
@@ -263,7 +263,7 @@ def eliminar_proveedor(usuario_actual, id):
 
 
 # ─────────────────────────────────────────────
-#  LOCACIONES
+#                 LOCACIONES
 # ─────────────────────────────────────────────
 
 @routes_bp.route("/api/locaciones", methods=["GET"])
@@ -315,7 +315,7 @@ def crear_locacion(usuario_actual):
 
 
 # ─────────────────────────────────────────────
-#  CLIMA
+#                     CLIMA
 # ─────────────────────────────────────────────
 
 @routes_bp.route("/api/clima", methods=["GET"])
@@ -328,5 +328,4 @@ def get_clima(usuario_actual):
         return jsonify(datos), 200
     except Exception:
         return jsonify({"error": "Error al obtener el clima"}), 500
-    
     
