@@ -273,3 +273,15 @@ def crear_locacion(usuario_actual):
     except Exception:
         db.session.rollback()
         return jsonify({"error": "Error al crear la locación"}), 500
+    
+# ─────────────────────────────────────────────
+#                     CLIMA
+# ─────────────────────────────────────────────
+
+@routes_bp.route("/api/clima", methods=["GET"])
+@token_requerido
+def get_clima(usuario_actual):
+    from clima import obtener_clima
+    ciudad = request.args.get("ciudad", "Buenos Aires")
+    datos = obtener_clima(ciudad)
+    return jsonify(datos), 200
