@@ -8,7 +8,7 @@ Lassalle Nora - Hernández Andrés
 """
 
 # ─────────────────────────────────────────────
-#  CLASE: Producto
+#               CLASE: Producto
 # ─────────────────────────────────────────────
 class Producto:
     """Representa un producto/plato del menú del foodtruck."""
@@ -75,7 +75,7 @@ class Producto:
 
 
 # ─────────────────────────────────────────────
-#  CLASE: Venta
+#                 CLASE: Venta
 # ─────────────────────────────────────────────
 class Venta:
 
@@ -96,7 +96,7 @@ class Venta:
 
 
 # ─────────────────────────────────────────────
-#  CLASE: Inventario
+#              CLASE: Inventario
 # ─────────────────────────────────────────────
 class Inventario:
 
@@ -134,7 +134,7 @@ class Inventario:
 
 
 # ─────────────────────────────────────────────
-#  CLASE: Foodtruck
+#              CLASE: Foodtruck
 # ─────────────────────────────────────────────
 class Foodtruck:
 
@@ -193,7 +193,7 @@ class Foodtruck:
 
 
 # ─────────────────────────────────────────────
-#  FUNCIONES DE MENÚ (entradas del usuario)
+#    FUNCIONES DE MENÚ (entradas del usuario)
 # ─────────────────────────────────────────────
 
 def pedir_entero(mensaje: str) -> int:
@@ -293,7 +293,7 @@ def menu_principal(ft: Foodtruck) -> None:
 
 
 # ─────────────────────────────────────────────
-#  PUNTO DE ENTRADA
+#               PUNTO DE ENTRADA
 # ─────────────────────────────────────────────
 if __name__ == "__main__":
     
