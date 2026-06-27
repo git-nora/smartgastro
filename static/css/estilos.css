@@ -202,3 +202,35 @@ body {
 
 .login-container h1 { color: #1B5E20; margin-bottom: 8px; }
 .login-container p { color: #666; margin-bottom: 24px; }
+
+/* INPUT CONTRASEÑA */
+.input-password {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-password input {
+    width: 100%;
+    padding-right: 40px;
+}
+
+.ojito {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* LINK CAMBIO LOGIN/REGISTRO */
+.link-cambio {
+    margin-top: 16px;
+    font-size: 13px;
+    color: #666;
+}
+
+.link-cambio a {
+    color: #1B5E20;
+    text-decoration: none;
+    font-weight: bold;
+}
