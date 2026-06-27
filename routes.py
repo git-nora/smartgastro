@@ -1,7 +1,7 @@
 """
 SmartGastro - Rutas CRUD
 Productos, Ventas, Proveedores y Locaciones
-Hernández Andrés
+Hernández Andrés / Lassalle Nora
 """
 
 from flask import Blueprint, request, jsonify
@@ -13,25 +13,28 @@ routes_bp = Blueprint("routes", __name__)
 
 
 # ─────────────────────────────────────────────
-#                  PRODUCTOS
+#  PRODUCTOS
 # ─────────────────────────────────────────────
 
 @routes_bp.route("/api/productos", methods=["GET"])
 @token_requerido
 def get_productos(usuario_actual):
-    productos = Producto.query.all()
-    resultado = []
-    for p in productos:
-        resultado.append({
-            "id": p.id,
-            "nombre": p.nombre,
-            "precio": p.precio,
-            "stock": p.stock,
-            "stock_minimo": p.stock_minimo,
-            "categoria": p.categoria,
-            "stock_bajo": p.stock <= p.stock_minimo
-        })
-    return jsonify(resultado), 200
+    try:
+        productos = Producto.query.all()
+        resultado = []
+        for p in productos:
+            resultado.append({
+                "id": p.id,
+                "nombre": p.nombre,
+                "precio": p.precio,
+                "stock": p.stock,
+                "stock_minimo": p.stock_minimo,
+                "categoria": p.categoria,
+                "stock_bajo": p.stock <= p.stock_minimo
+            })
+        return jsonify(resultado), 200
+    except Exception:
+        return jsonify({"error": "Error al obtener los productos"}), 500
 
 
 @routes_bp.route("/api/productos", methods=["POST"])
@@ -41,14 +44,20 @@ def crear_producto(usuario_actual):
 
     if not datos:
         return jsonify({"error": "El body debe ser JSON"}), 400
-    if not datos.get("nombre") or not datos.get("categoria"):
-        return jsonify({"error": "nombre y categoria son obligatorios"}), 400
-    if datos.get("precio") is None or float(datos["precio"]) < 0:
-        return jsonify({"error": "precio debe ser mayor o igual a 0"}), 400
+    if not datos.get("nombre") or not datos.get("nombre").strip():
+        return jsonify({"error": "El nombre es obligatorio"}), 400
+    if not datos.get("categoria"):
+        return jsonify({"error": "La categoría es obligatoria"}), 400
+    if datos.get("precio") is None:
+        return jsonify({"error": "El precio es obligatorio"}), 400
+    if float(datos["precio"]) < 0:
+        return jsonify({"error": "El precio no puede ser negativo"}), 400
+    if datos.get("stock") is not None and int(datos["stock"]) < 0:
+        return jsonify({"error": "El stock no puede ser negativo"}), 400
 
     try:
         producto = Producto(
-            nombre=datos["nombre"],
+            nombre=datos["nombre"].strip(),
             precio=float(datos["precio"]),
             stock=int(datos.get("stock", 0)),
             stock_minimo=int(datos.get("stock_minimo", 5)),
@@ -70,12 +79,19 @@ def actualizar_producto(usuario_actual, id):
         return jsonify({"error": f"Producto {id} no encontrado"}), 404
 
     datos = request.get_json()
+    if not datos:
+        return jsonify({"error": "El body debe ser JSON"}), 400
+
     try:
         if datos.get("nombre"):
-            producto.nombre = datos["nombre"]
+            producto.nombre = datos["nombre"].strip()
         if datos.get("precio") is not None:
+            if float(datos["precio"]) < 0:
+                return jsonify({"error": "El precio no puede ser negativo"}), 400
             producto.precio = float(datos["precio"])
         if datos.get("stock") is not None:
+            if int(datos["stock"]) < 0:
+                return jsonify({"error": "El stock no puede ser negativo"}), 400
             producto.stock = int(datos["stock"])
         if datos.get("categoria"):
             producto.categoria = datos["categoria"]
@@ -100,31 +116,35 @@ def eliminar_producto(usuario_actual, id):
     except Exception:
         db.session.rollback()
         return jsonify({"error": "Error al eliminar el producto"}), 500
-    
+
+
 # ─────────────────────────────────────────────
-#                    VENTAS
+#  VENTAS
 # ─────────────────────────────────────────────
 
 @routes_bp.route("/api/ventas", methods=["GET"])
 @token_requerido
 def get_ventas(usuario_actual):
-    ventas = Venta.query.all()
-    resultado = []
-    for v in ventas:
-        detalles = []
-        for d in v.detalles:
-            detalles.append({
-                "id_producto": d.id_producto,
-                "cantidad": d.cantidad,
-                "subtotal": d.subtotal
+    try:
+        ventas = Venta.query.all()
+        resultado = []
+        for v in ventas:
+            detalles = []
+            for d in v.detalles:
+                detalles.append({
+                    "id_producto": d.id_producto,
+                    "cantidad": d.cantidad,
+                    "subtotal": d.subtotal
+                })
+            resultado.append({
+                "id": v.id,
+                "fecha_hora": v.fecha_hora.strftime("%d/%m/%Y %H:%M"),
+                "total": v.total,
+                "detalles": detalles
             })
-        resultado.append({
-            "id": v.id,
-            "fecha_hora": v.fecha_hora.strftime("%d/%m/%Y %H:%M"),
-            "total": v.total,
-            "detalles": detalles
-        })
-    return jsonify(resultado), 200
+        return jsonify(resultado), 200
+    except Exception:
+        return jsonify({"error": "Error al obtener las ventas"}), 500
 
 
 @routes_bp.route("/api/ventas", methods=["POST"])
@@ -132,7 +152,9 @@ def get_ventas(usuario_actual):
 def crear_venta(usuario_actual):
     datos = request.get_json()
 
-    if not datos or not datos.get("detalles"):
+    if not datos:
+        return jsonify({"error": "El body debe ser JSON"}), 400
+    if not datos.get("detalles") or len(datos["detalles"]) == 0:
         return jsonify({"error": "Se requiere al menos un producto en la venta"}), 400
 
     try:
@@ -140,19 +162,24 @@ def crear_venta(usuario_actual):
         detalles_objects = []
 
         for item in datos["detalles"]:
+            if not item.get("id_producto") or not item.get("cantidad"):
+                return jsonify({"error": "Cada detalle requiere id_producto y cantidad"}), 400
+            if int(item["cantidad"]) <= 0:
+                return jsonify({"error": "La cantidad debe ser mayor a 0"}), 400
+
             producto = Producto.query.get(item["id_producto"])
             if not producto:
                 return jsonify({"error": f"Producto {item['id_producto']} no encontrado"}), 404
-            if producto.stock < item["cantidad"]:
-                return jsonify({"error": f"Stock insuficiente para {producto.nombre}"}), 400
+            if producto.stock < int(item["cantidad"]):
+                return jsonify({"error": f"Stock insuficiente para {producto.nombre}. Disponible: {producto.stock}"}), 400
 
-            subtotal = producto.precio * item["cantidad"]
+            subtotal = producto.precio * int(item["cantidad"])
             total += subtotal
-            producto.stock -= item["cantidad"]
+            producto.stock -= int(item["cantidad"])
 
             detalles_objects.append(DetalleVenta(
                 id_producto=producto.id,
-                cantidad=item["cantidad"],
+                cantidad=int(item["cantidad"]),
                 subtotal=subtotal
             ))
 
@@ -172,23 +199,26 @@ def crear_venta(usuario_actual):
 
 
 # ─────────────────────────────────────────────
-#                 PROVEEDORES
+#  PROVEEDORES
 # ─────────────────────────────────────────────
 
 @routes_bp.route("/api/proveedores", methods=["GET"])
 @token_requerido
 def get_proveedores(usuario_actual):
-    proveedores = Proveedor.query.all()
-    resultado = []
-    for p in proveedores:
-        resultado.append({
-            "id": p.id,
-            "nombre": p.nombre,
-            "contacto": p.contacto,
-            "telefono": p.telefono,
-            "email": p.email
-        })
-    return jsonify(resultado), 200
+    try:
+        proveedores = Proveedor.query.all()
+        resultado = []
+        for p in proveedores:
+            resultado.append({
+                "id": p.id,
+                "nombre": p.nombre,
+                "contacto": p.contacto,
+                "telefono": p.telefono,
+                "email": p.email
+            })
+        return jsonify(resultado), 200
+    except Exception:
+        return jsonify({"error": "Error al obtener los proveedores"}), 500
 
 
 @routes_bp.route("/api/proveedores", methods=["POST"])
@@ -196,12 +226,14 @@ def get_proveedores(usuario_actual):
 def crear_proveedor(usuario_actual):
     datos = request.get_json()
 
-    if not datos or not datos.get("nombre"):
+    if not datos:
+        return jsonify({"error": "El body debe ser JSON"}), 400
+    if not datos.get("nombre") or not datos.get("nombre").strip():
         return jsonify({"error": "El nombre del proveedor es obligatorio"}), 400
 
     try:
         proveedor = Proveedor(
-            nombre=datos["nombre"],
+            nombre=datos["nombre"].strip(),
             contacto=datos.get("contacto"),
             telefono=datos.get("telefono"),
             email=datos.get("email")
@@ -231,22 +263,25 @@ def eliminar_proveedor(usuario_actual, id):
 
 
 # ─────────────────────────────────────────────
-#                   LOCACIONES
+#  LOCACIONES
 # ─────────────────────────────────────────────
 
 @routes_bp.route("/api/locaciones", methods=["GET"])
 @token_requerido
 def get_locaciones(usuario_actual):
-    locaciones = Locacion.query.all()
-    resultado = []
-    for l in locaciones:
-        resultado.append({
-            "id": l.id,
-            "nombre": l.nombre,
-            "direccion": l.direccion,
-            "fecha": l.fecha.strftime("%d/%m/%Y")
-        })
-    return jsonify(resultado), 200
+    try:
+        locaciones = Locacion.query.all()
+        resultado = []
+        for l in locaciones:
+            resultado.append({
+                "id": l.id,
+                "nombre": l.nombre,
+                "direccion": l.direccion,
+                "fecha": l.fecha.strftime("%d/%m/%Y")
+            })
+        return jsonify(resultado), 200
+    except Exception:
+        return jsonify({"error": "Error al obtener las locaciones"}), 500
 
 
 @routes_bp.route("/api/locaciones", methods=["POST"])
@@ -254,14 +289,18 @@ def get_locaciones(usuario_actual):
 def crear_locacion(usuario_actual):
     datos = request.get_json()
 
-    if not datos or not datos.get("nombre") or not datos.get("fecha"):
-        return jsonify({"error": "nombre y fecha son obligatorios"}), 400
+    if not datos:
+        return jsonify({"error": "El body debe ser JSON"}), 400
+    if not datos.get("nombre") or not datos.get("nombre").strip():
+        return jsonify({"error": "El nombre es obligatorio"}), 400
+    if not datos.get("fecha"):
+        return jsonify({"error": "La fecha es obligatoria"}), 400
 
     try:
         from datetime import datetime
         fecha = datetime.strptime(datos["fecha"], "%Y-%m-%d").date()
         locacion = Locacion(
-            nombre=datos["nombre"],
+            nombre=datos["nombre"].strip(),
             direccion=datos.get("direccion"),
             fecha=fecha
         )
@@ -273,15 +312,21 @@ def crear_locacion(usuario_actual):
     except Exception:
         db.session.rollback()
         return jsonify({"error": "Error al crear la locación"}), 500
-    
+
+
 # ─────────────────────────────────────────────
-#                     CLIMA
+#  CLIMA
 # ─────────────────────────────────────────────
 
 @routes_bp.route("/api/clima", methods=["GET"])
 @token_requerido
 def get_clima(usuario_actual):
-    from clima import obtener_clima
-    ciudad = request.args.get("ciudad", "Buenos Aires")
-    datos = obtener_clima(ciudad)
-    return jsonify(datos), 200
+    try:
+        from clima import obtener_clima
+        ciudad = request.args.get("ciudad", "Buenos Aires")
+        datos = obtener_clima(ciudad)
+        return jsonify(datos), 200
+    except Exception:
+        return jsonify({"error": "Error al obtener el clima"}), 500
+    
+    
